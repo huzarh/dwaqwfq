@@ -10,7 +10,6 @@ The system consists of several components:
 2. **Model Training**: Trains a RandomForest classifier on the extracted features.
 3. **Inference**: Uses the trained model to predict speakers for new audio files.
 4. **Pipeline**: Orchestrates the entire process from training to inference.
-5. **Speaker Identification**: Identifies the speaker of a single audio file using the trained model.
 
 ## System Requirements
 
@@ -31,62 +30,42 @@ The system consists of several components:
 │       ├── chunk_1.wav
 │       ├── chunk_2.wav
 │       └── ...
-├── test_data/                # Test data
-├── outputs/                  # Output directory
-│   ├── models_TIMESTAMP/     # Trained models
-│   └── results_TIMESTAMP/    # Inference results
-├── simple_extract.py         # Feature extraction and training
-├── simple_predict.py         # Inference script
-├── run_pipeline.py           # Complete pipeline
-├── identify_speaker.py       # Speaker identification script
-└── quick_identify.py         # Simplified speaker identification
+├── training/                 # Training module
+│   ├── utils.py              # Utility functions
+│   ├── feature_extraction.py # Feature extraction
+│   ├── train_model.py        # Model training
+│   ├── model_evaluation.py   # Model evaluation
+│   └── run_pipeline.py       # Training pipeline
+├── inference/                # Inference module
+│   ├── predict.py            # Prediction script
+│   └── utils.py              # Inference utilities
+├── simple_extract.py         # Legacy feature extraction and training
+├── simple_predict.py         # Legacy inference script
+└── run_pipeline.py           # Legacy complete pipeline
 ```
 
 ## Quick Start
 
-### 1. Run the Complete Pipeline
+### 1. Run the Complete Training Pipeline
 
-To run the complete pipeline (training and inference):
+To run the complete training pipeline:
 
 ```bash
-python run_pipeline.py --data_dir dataset --test_dir test_data
+python -m training.run_pipeline --data_dir dataset --output_dir training_outputs
 ```
 
 This will:
-1. Train a model on the data in `dataset/`
-2. Generate predictions for audio files in `test_data/`
-3. Save the model and predictions in timestamped directories under `outputs/`
+1. Extract features from the audio files
+2. Train a model
+3. Evaluate the model
+4. Save all outputs to timestamped directories
 
-### 2. Train a Model Only
+### 2. Run Inference on New Audio Files
 
-To train a model without running inference:
-
-```bash
-python simple_extract.py --data_dir dataset --output_dir models
-```
-
-### 3. Run Inference Only
-
-To run inference using a pre-trained model:
+To run inference using a trained model:
 
 ```bash
-python simple_predict.py --test_dir test_data --model_dir models --output_file predictions.csv
-```
-
-### 4. Identify a Single Speaker
-
-To identify the speaker of a single audio file:
-
-```bash
-python identify_speaker.py --audio_path /path/to/audio.wav --model_dir outputs/models_TIMESTAMP
-```
-
-### 5. Quick Speaker Identification
-
-For quick identification using the latest trained model:
-
-```bash
-python quick_identify.py /path/to/audio.wav
+python simple_predict.py --test_dir test_data --model_dir training_outputs/run_TIMESTAMP/model --output_file predictions.csv
 ```
 
 ## Technical Details
@@ -115,24 +94,6 @@ To add new speakers to the system:
 1. Create a new directory for the speaker under the `dataset/` directory
 2. Place the speaker's audio files (WAV format) in the directory
 3. Re-train the model using the training script or pipeline
-
-## Troubleshooting
-
-- **File Format Issues**: Ensure all audio files are in WAV format
-- **Missing Dependencies**: Install required dependencies from `requirements.txt`
-- **Performance Issues**: Increase the amount of training data or adjust model parameters
-
-## Advanced Usage
-
-Advanced parameters can be passed to the training script:
-
-```bash
-python simple_extract.py --data_dir dataset --output_dir models --test_size 0.2 --seed 42
-```
-
-Parameters:
-- `--test_size`: Proportion of data to use for testing (default: 0.2)
-- `--seed`: Random seed for reproducibility (default: 42)
 
 ## Audio-Image Classification
 
