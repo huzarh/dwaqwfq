@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import List, Optional, Union, Any
 
 def setup_logging(log_file: Optional[str] = None) -> None:
-    """Set up logging configuration"""
+    # note kayıtları
     handlers = [logging.StreamHandler()]
     
     if log_file:
@@ -22,20 +22,10 @@ def setup_logging(log_file: Optional[str] = None) -> None:
     )
 
 def run_command(cmd: List[str], description: Optional[str] = None) -> bool:
-    """
-    Run a shell command and print output in real-time.
-    
-    Args:
-        cmd: Command to run as a list of arguments
-        description: Optional description of the command
-        
-    Returns:
-        True if the command succeeded, False otherwise
-    """
     if description:
         logging.info(description)
     
-    logging.info(f"Running command: {' '.join(cmd)}")
+    logging.info(f"pipeline komut: {' '.join(cmd)}")
     
     try:
         process = subprocess.Popen(
@@ -45,36 +35,25 @@ def run_command(cmd: List[str], description: Optional[str] = None) -> bool:
             universal_newlines=True
         )
         
-        # Print output in real-time
         for line in process.stdout:
             print(line.strip())
         
-        # Wait for process to complete
         process.wait()
         
         if process.returncode != 0:
-            logging.error(f"Command failed with exit code {process.returncode}")
+            logging.error(f"pipeline komut başarısız {process.returncode}")
             return False
         
         return True
     
     except Exception as e:
-        logging.error(f"Error executing command: {e}")
+        logging.error(f"pipline komut hatası: {e}")
         return False
 
 def run_training_pipeline(args: argparse.Namespace) -> bool:
-    """
-    Run the complete training pipeline.
-    
-    Args:
-        args: Command-line arguments
-        
-    Returns:
-        True if the pipeline succeeded, False otherwise
-    """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Create output directories
+    # çıktı dizinleri
     output_dir = os.path.join(args.output_dir, f"run_{timestamp}")
     features_dir = os.path.join(output_dir, "features")
     model_dir = os.path.join(output_dir, "model")
@@ -84,28 +63,26 @@ def run_training_pipeline(args: argparse.Namespace) -> bool:
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(log_dir, exist_ok=True)
     
-    # Set up logging
+    # note kayıtları
     log_file = os.path.join(log_dir, "pipeline.log")
     setup_logging(log_file)
     
-    logging.info(f"Starting training pipeline at {timestamp}")
-    logging.info(f"Data directory: {args.data_dir}")
-    logging.info(f"Output directory: {output_dir}")
+    logging.info(f"eğitim pipeline baş: {timestamp}")
+    logging.info(f"veri dizini: {args.data_dir}")
+    logging.info(f"çıktı dizini: {output_dir}")
     
-    # Step 1: Extract features
-    logging.info("=== Step 1: Extracting features ===")
+    logging.info("============== Özellik çıkarım ==============")
     feature_extraction_cmd = [
         "python", "-m", "training.feature_extraction",
         "--data_dir", args.data_dir,
         "--output_dir", features_dir
     ]
     
-    if not run_command(feature_extraction_cmd, "Extracting features from audio files"):
-        logging.error("Feature extraction failed. Pipeline stopped.")
+    if not run_command(feature_extraction_cmd, "Özellik çıkarım başarısız. Pipeline durduruldu."):
+        logging.error("Özellik çıkarım başarısız. Pipeline durduruldu.")
         return False
-    
-    # Step 2: Train model
-    logging.info("=== Step 2: Training model ===")
+
+    logging.info("============== model eğitimi ==============")
     train_model_cmd = [
         "python", "-m", "training.train_model",
         "--data_dir", args.data_dir,
@@ -113,13 +90,13 @@ def run_training_pipeline(args: argparse.Namespace) -> bool:
         "--seed", str(args.seed)
     ]
     
-    if not run_command(train_model_cmd, "Training speaker classification model"):
-        logging.error("Model training failed. Pipeline stopped.")
+    if not run_command(train_model_cmd, "Model eğitimi başarısız. Pipeline durduruldu."):
+        logging.error("Model eğitimi başarısız. Pipeline durduruldu.")
         return False
     
-    # Step 3: Evaluate model (if test data is available)
+
     if os.path.exists(os.path.join(features_dir, "features.pkl")) and os.path.exists(os.path.join(features_dir, "labels.pkl")):
-        logging.info("=== Step 3: Evaluating model ===")
+        logging.info("============== model değerlendirme ==============")
         evaluate_cmd = [
             "python", "-m", "training.model_evaluation",
             "--model_dir", model_dir,
@@ -128,22 +105,21 @@ def run_training_pipeline(args: argparse.Namespace) -> bool:
             "--output_dir", evaluation_dir
         ]
         
-        if not run_command(evaluate_cmd, "Evaluating model performance"):
-            logging.error("Model evaluation failed. Pipeline stopped.")
+        if not run_command(evaluate_cmd, "Model değerlendirme başarısız. Pipeline durduruldu."):
+            logging.error("Model değerlendirme başarısız. Pipeline durduruldu.")
             return False
     else:
-        logging.warning("No test data available for evaluation. Skipping evaluation step.")
+        logging.warning("Test veri sorunu")
     
-    logging.info("=== Pipeline completed successfully ===")
-    logging.info(f"Trained model saved to {model_dir}")
+    logging.info("============== pipeline tamamlandı ==============")
+    logging.info(f"model kaydedildi {model_dir}")
     
     if os.path.exists(evaluation_dir):
-        logging.info(f"Evaluation results saved to {evaluation_dir}")
+        logging.info(f"değerlendirme sonuçları kaydedildi {evaluation_dir}")
     
     return True
 
 def main():
-    """Main function for running the training pipeline"""
     parser = argparse.ArgumentParser(description="Run the complete speaker classification training pipeline")
     parser.add_argument("--data_dir", type=str, required=True, help="Directory containing the training dataset")
     parser.add_argument("--output_dir", type=str, default="training_outputs", help="Base directory for outputs")

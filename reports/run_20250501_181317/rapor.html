@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ses ile Görüntü Sınıflandırma Kategorisi Yarışma Sayısal Raporu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .metrics {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .metric-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        .visualizations {
+            margin-bottom: 30px;
+        }
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 20px;
+        }
+        .viz-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .viz-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 3px;
+        }
+        .viz-title {
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Ses ile Görüntü Sınıflandırma Kategorisi Yarışma Sayısal Raporu</h1>
+        <p>Rapor ID: run_20250501_181317</p>
+        <p>Oluşturulma Tarihi: 2025-05-01 18:35:38</p>
+    </div>
+    
+    <h2>Model Performans Ölçümleri</h2>
+    <div class="metrics">
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-value">94.56%</div>
+                <div class="metric-label">Doğruluk 100-desi</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">94.50%</div>
+                <div class="metric-label">Makro F1 Skoru</div>
+            </div>
+        </div>
+    </div>
+    
+    <h2>Ses sınıfı başarısı</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Ses seti</th>
+                <th>Kesinlik</th>
+                <th>Yaklaşık Doğruluk</th>
+                <th>F1 Skoru (harmonik ortalaması)</th>
+                <th>Veri sayısı</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td>person1</td>
+                <td>0.9638</td>
+                <td>0.9573</td>
+                <td>0.9605</td>
+                <td>750.0</td>
+            </tr>
+
+            <tr>
+                <td>person10</td>
+                <td>0.9350</td>
+                <td>0.9637</td>
+                <td>0.9491</td>
+                <td>881.0</td>
+            </tr>
+
+            <tr>
+                <td>person2</td>
+                <td>0.9749</td>
+                <td>0.9962</td>
+                <td>0.9854</td>
+                <td>1051.0</td>
+            </tr>
+
+            <tr>
+                <td>person3</td>
+                <td>0.9415</td>
+                <td>0.9484</td>
+                <td>0.9449</td>
+                <td>950.0</td>
+            </tr>
+
+            <tr>
+                <td>person4</td>
+                <td>0.9141</td>
+                <td>0.8933</td>
+                <td>0.9036</td>
+                <td>750.0</td>
+            </tr>
+
+            <tr>
+                <td>person6</td>
+                <td>0.9358</td>
+                <td>0.9235</td>
+                <td>0.9296</td>
+                <td>758.0</td>
+            </tr>
+
+            <tr>
+                <td>person7</td>
+                <td>0.9625</td>
+                <td>0.9560</td>
+                <td>0.9593</td>
+                <td>591.0</td>
+            </tr>
+
+            <tr>
+                <td>person8</td>
+                <td>0.9283</td>
+                <td>0.9044</td>
+                <td>0.9162</td>
+                <td>931.0</td>
+            </tr>
+
+            <tr>
+                <td>person9</td>
+                <td>0.9538</td>
+                <td>0.9587</td>
+                <td>0.9562</td>
+                <td>581.0</td>
+            </tr>
+
+        </tbody>
+    </table>
+    
+    <h2>Grafikler</h2>
+    <div class="visualizations">
+        <div class="viz-grid">
+
+            <div class="viz-item">
+                <img src="images/confusion_matrix.png" alt="confusion_matrix.png">
+                <div class="viz-title">confusion matrix</div>
+            </div>
+
+            <div class="viz-item">
+                <img src="images/confusion_matrix_normalized.png" alt="confusion_matrix_normalized.png">
+                <div class="viz-title">confusion matrix normalized</div>
+            </div>
+
+            <div class="viz-item">
+                <img src="images/feature_importance.png" alt="feature_importance.png">
+                <div class="viz-title">feature importance</div>
+            </div>
+
+            <div class="viz-item">
+                <img src="images/learning_curve.png" alt="learning_curve.png">
+                <div class="viz-title">learning curve</div>
+            </div>
+
+            <div class="viz-item">
+                <img src="images/pca_visualization.png" alt="pca_visualization.png">
+                <div class="viz-title">pca visualization</div>
+            </div>
+
+            <div class="viz-item">
+                <img src="images/sample_distribution.png" alt="sample_distribution.png">
+                <div class="viz-title">sample distribution</div>
+            </div>
+
+            <div class="viz-item">
+                <img src="images/tanimlama_matris.png" alt="tanimlama_matris.png">
+                <div class="viz-title">tanimlama matris</div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>2025 @ copyrigth by ZirCon</p>
+    </div>
+</body>
+</html>

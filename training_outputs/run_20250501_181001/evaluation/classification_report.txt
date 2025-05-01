@@ -1,0 +1,15 @@
+              precision    recall  f1-score   support
+
+     person1       0.96      0.96      0.96       750
+    person10       0.94      0.96      0.95       881
+     person2       0.97      1.00      0.99      1051
+     person3       0.94      0.95      0.94       950
+     person4       0.91      0.89      0.90       750
+     person6       0.94      0.92      0.93       758
+     person7       0.96      0.96      0.96       591
+     person8       0.93      0.90      0.92       931
+     person9       0.95      0.96      0.96       581
+
+    accuracy                           0.95      7243
+   macro avg       0.95      0.94      0.94      7243
+weighted avg       0.95      0.95      0.95      7243

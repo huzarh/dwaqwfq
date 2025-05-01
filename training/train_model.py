@@ -10,11 +10,11 @@ from sklearn.model_selection import train_test_split, learning_curve
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 import glob
 
-# Import the feature extraction function from the training utils
+
+
 from training.utils import extract_features
 
 def setup_logging(log_file=None):
-    """Set up logging configuration"""
     handlers = [logging.StreamHandler()]
     
     if log_file:
@@ -28,62 +28,45 @@ def setup_logging(log_file=None):
     )
 
 def process_dataset(data_dir):
-    """Process all audio files in the dataset directory"""
     features = []
     labels = []
     file_paths = []
     
-    logging.info(f"Processing audio files in {data_dir}")
+    logging.info(f"İşlenme dosyaları {data_dir}")
     
-    # Get all speaker directories
+    # ses dirs
     speaker_dirs = [d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d))]
-    speaker_dirs.sort()  # Sort to ensure consistent mapping
+    speaker_dirs.sort()
     
-    # Create mapping from index to speaker name
     speaker_mapping = {i: name for i, name in enumerate(speaker_dirs)}
     
-    # Process each speaker directory
+    # wav işlem
     for idx, speaker in enumerate(speaker_dirs):
         speaker_dir = os.path.join(data_dir, speaker)
         audio_files = glob.glob(os.path.join(speaker_dir, "*.wav"))
         
-        logging.info(f"Found {len(audio_files)} files for speaker {speaker}")
+        logging.info(f"yakaladm --- {len(audio_files)} seni --> {speaker}")
         
         for audio_file in audio_files:
             try:
-                # Extract features
-                feature_vector = extract_features(audio_file)
-                
-                # Add to dataset
+                # --- özellik çıkarım fonksiyonu utilsden alınıypr
+                feature_vector = extract_features(audio_file)                
                 features.append(feature_vector)
                 labels.append(idx)
                 file_paths.append(audio_file)
             except Exception as e:
-                logging.error(f"Failed to process {audio_file}: {e}")
+                logging.error(f"Unite bak {audio_file}: {e}")
     
     return np.array(features), np.array(labels), file_paths, speaker_mapping
 
-def plot_learning_curve(estimator, X, y, title, output_dir, ylim=None, cv=5, n_jobs=-1, train_sizes=np.linspace(.1, 1.0, 5)):
-    """
-    Generate a learning curve plot.
-    
-    Args:
-        estimator: The model to use
-        X: Features
-        y: Labels
-        title: Plot title
-        output_dir: Directory to save the plot
-        ylim: Y-axis limits
-        cv: Cross-validation folds
-        n_jobs: Number of jobs for parallel processing
-        train_sizes: Training set sizes to plot
-    """
+def plot_learning_curve(estimator, X, y, title, output_dir, ylim=None, cv=5, n_jobs=-1, train_sizes=np.linspace(.1, 1.0, 100)):
+
     plt.figure(figsize=(10, 6))
     plt.title(title, fontsize=16)
     if ylim is not None:
         plt.ylim(*ylim)
-    plt.xlabel("Training examples", fontsize=14)
-    plt.ylabel("Score", fontsize=14)
+    plt.xlabel("Eğitim sürec", fontsize=14)
+    plt.ylabel("Skor", fontsize=14)
     
     train_sizes, train_scores, test_scores = learning_curve(
         estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes, scoring='accuracy')
@@ -98,9 +81,9 @@ def plot_learning_curve(estimator, X, y, title, output_dir, ylim=None, cv=5, n_j
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
                      train_scores_mean + train_scores_std, alpha=0.1, color="r")
     plt.fill_between(train_sizes, test_scores_mean - test_scores_std,
-                     test_scores_mean + test_scores_std, alpha=0.1, color="g")
-    plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
-    plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
+                     test_scores_mean + test_scores_std, alpha=0.1, color="b")
+    plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Eğitim skoru")
+    plt.plot(train_sizes, test_scores_mean, 'o-', color="b", label="Doğrulama skoru")
     
     plt.legend(loc="best", fontsize=12)
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -110,31 +93,20 @@ def plot_learning_curve(estimator, X, y, title, output_dir, ylim=None, cv=5, n_j
     plt.savefig(os.path.join(output_dir, 'learning_curve.png'), dpi=300)
     plt.close()
     
-    logging.info(f"Saved learning curve plot to {output_dir}")
+    logging.info(f"Hedef skore yaklaşım resim kayıt: {output_dir}")
 
 def plot_sample_distribution(labels, speaker_mapping, output_dir):
-    """
-    Generate a plot showing the distribution of samples per speaker.
-    
-    Args:
-        labels: Labels array
-        speaker_mapping: Mapping from indices to speaker names
-        output_dir: Directory to save the plot
-    """
-    # Count samples per class
+
     unique_labels, counts = np.unique(labels, return_counts=True)
     
-    # Get speaker names
-    speaker_names = [speaker_mapping.get(label, f"Speaker {label}") for label in unique_labels]
-    
+    speaker_names = [speaker_mapping.get(label, f" {label}") for label in unique_labels]
     # Plot
     plt.figure(figsize=(12, 6))
     plt.bar(speaker_names, counts, color='skyblue')
-    plt.title('Number of Samples per Speaker', fontsize=16)
-    plt.xlabel('Speaker', fontsize=14)
-    plt.ylabel('Number of Samples', fontsize=14)
+    plt.title('KULLANILAN VERİLER', fontsize=16)
+    plt.xlabel('Ses seti', fontsize=14)
+    plt.ylabel('Ses seti sayısı', fontsize=14)
     
-    # Add the count numbers above the bars
     for i, count in enumerate(counts):
         plt.text(i, count + 5, str(count), ha='center', fontsize=12)
     
@@ -147,53 +119,51 @@ def plot_sample_distribution(labels, speaker_mapping, output_dir):
     plt.savefig(os.path.join(output_dir, 'sample_distribution.png'), dpi=300)
     plt.close()
     
-    logging.info(f"Saved sample distribution plot to {output_dir}")
+    logging.info(f"Kullanılan veri dağılımı resim kayıt: {output_dir}")
 
 def train_model(features, labels, output_dir, random_state=42):
-    """Train a RandomForest model on the given features and labels"""
-    # Split data into training and testing sets
+    # sınıar ağının eğitimi
     X_train, X_test, y_train, y_test = train_test_split(
         features, labels, test_size=0.2, random_state=random_state
     )
     
-    logging.info(f"Training set: {len(X_train)} samples")
-    logging.info(f"Test set: {len(X_test)} samples")
+    logging.info(f"Eğitim seti: {len(X_train)} samples")
+    logging.info(f"Doğrulama seti: {len(X_test)} samples")
     
-    # Create visualization directory
+    # görselleştirme dizini
     viz_dir = os.path.join(output_dir, "visualizations")
     os.makedirs(viz_dir, exist_ok=True)
     
-    # Train model
+    # model
     model = RandomForestClassifier(n_estimators=100, random_state=random_state)
     model.fit(X_train, y_train)
     
-    # Evaluate model
+    #model değerlendirme
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred, average='macro')
     
-    logging.info(f"Model accuracy: {accuracy:.4f}")
-    logging.info(f"Macro F1 score: {f1:.4f}")
+    logging.info(f"Model doğruluğu: {accuracy:.4f}")
+    logging.info(f"Makro F1 skoru: {f1:.4f}")
     
-    # Print detailed classification report
+    # detaylı sınıflandırma raporu
     report = classification_report(y_test, y_pred, output_dict=True)
-    logging.info("Detailed performance metrics:")
+    logging.info("Detaylı performans ölçümleri:")
     for label, metrics in report.items():
         if isinstance(metrics, dict):
             logging.info(f"  Class '{label}': F1-score={metrics['f1-score']:.4f}, Precision={metrics['precision']:.4f}, Recall={metrics['recall']:.4f}")
     
-    # Generate learning curve
+    # öğrenme
     plot_learning_curve(
         RandomForestClassifier(n_estimators=100, random_state=random_state),
         features, labels,
-        "Learning Curve (RandomForest)",
+        "Eğitim grafiği",
         viz_dir
     )
     
     return model, X_test, y_test, y_pred
 
 def save_model(model, speaker_mapping, output_dir):
-    """Save the trained model and speaker mapping to the specified directory"""
     os.makedirs(output_dir, exist_ok=True)
     
     model_path = os.path.join(output_dir, "model.pkl")
@@ -205,41 +175,40 @@ def save_model(model, speaker_mapping, output_dir):
     with open(mapping_path, "wb") as f:
         pickle.dump(speaker_mapping, f)
     
-    logging.info(f"Model and speaker mapping saved to {output_dir}")
+    logging.info(f"Eşleştirme modeli kayt: {output_dir}")
 
 def run_training(args):
-    """Run the complete training pipeline"""
-    # Set up logging
+    # notlar
     log_dir = os.path.join(args.output_dir, "logs")
     os.makedirs(log_dir, exist_ok=True)
     log_file = os.path.join(log_dir, "training.log")
     setup_logging(log_file)
     
-    logging.info(f"Starting training process with data from {args.data_dir}")
+    logging.info(f"Eğitim sürec başlıyor {args.data_dir}")
     
-    # Process dataset
+    # veri seti işleme
     features, labels, file_paths, speaker_mapping = process_dataset(args.data_dir)
     
     if len(features) == 0:
-        logging.error("No usable data extracted")
+        logging.error("Kullanılabilir veri çıkarılmadı")
         return False
     
-    logging.info(f"Extracted features for {len(features)} audio files")
+    logging.info(f"özellikler çıkarıldı {len(features)} ses dosyası")
     
-    # Create visualization directory
+    # görselleştirme dizini
     viz_dir = os.path.join(args.output_dir, "visualizations")
     os.makedirs(viz_dir, exist_ok=True)
     
-    # Plot sample distribution
+    # örnek dağılım
     plot_sample_distribution(labels, speaker_mapping, viz_dir)
     
-    # Train model
+    # model
     model, X_test, y_test, y_pred = train_model(features, labels, args.output_dir, args.seed)
     
-    # Save model and mapping
+    # model ve eşleştirme kayıt
     save_model(model, speaker_mapping, args.output_dir)
     
-    logging.info("Training completed successfully")
+    logging.info("----------- eğitim tamamlandı ------------")
     return True
 
 if __name__ == "__main__":

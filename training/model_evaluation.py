@@ -47,10 +47,10 @@ def load_speaker_mapping(mapping_path: str) -> Dict[int, str]:
     try:
         with open(mapping_path, 'rb') as f:
             mapping = pickle.load(f)
-        logging.info(f"Loaded speaker mapping from {mapping_path}")
+        logging.info(f"seslendirici eşleme yüklendi {mapping_path}")
         return mapping
     except Exception as e:
-        logging.error(f"Error loading speaker mapping from {mapping_path}: {e}")
+        logging.error(f"seslendirici eşleme yüklerken hata: {mapping_path}: {e}")
         return {}
 
 def plot_confusion_matrix(
@@ -73,7 +73,7 @@ def plot_confusion_matrix(
     cm = confusion_matrix(y_true, y_pred)
     plt.figure(figsize=(10, 8))
     plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-    plt.title('Confusion Matrix', fontsize=16)
+    plt.title('karmaşıklık Matrisi (takip)', fontsize=16)
     plt.colorbar()
     tick_marks = np.arange(len(labels))
     plt.xticks(tick_marks, labels, rotation=45, fontsize=12)
@@ -89,8 +89,8 @@ def plot_confusion_matrix(
                     fontsize=12)
     
     plt.tight_layout()
-    plt.ylabel('True label', fontsize=14)
-    plt.xlabel('Predicted label', fontsize=14)
+    plt.ylabel('gerçek label değerler', fontsize=14)
+    plt.xlabel('Tahmini değerler', fontsize=14)
     plt.savefig(os.path.join(output_dir, 'confusion_matrix.png'), dpi=300)
     plt.close()
     
@@ -98,7 +98,7 @@ def plot_confusion_matrix(
     plt.figure(figsize=(10, 8))
     cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
     plt.imshow(cm_normalized, interpolation='nearest', cmap=plt.cm.Blues)
-    plt.title('Normalized Confusion Matrix', fontsize=16)
+    plt.title('düzeltilmiş karmaşıklık Matrisi (takip)', fontsize=16)
     plt.colorbar()
     plt.xticks(tick_marks, labels, rotation=45, fontsize=12)
     plt.yticks(tick_marks, labels, fontsize=12)
@@ -112,12 +112,12 @@ def plot_confusion_matrix(
                     fontsize=12)
     
     plt.tight_layout()
-    plt.ylabel('True label', fontsize=14)
-    plt.xlabel('Predicted label', fontsize=14)
+    plt.ylabel('gerçek label değerler', fontsize=14)
+    plt.xlabel('tahmin edilen değerler', fontsize=14)
     plt.savefig(os.path.join(output_dir, 'confusion_matrix_normalized.png'), dpi=300)
     plt.close()
     
-    logging.info(f"Saved confusion matrices to {output_dir}")
+    logging.info(f"karmaşıklık matrisleri kayd: {output_dir}")
 
 def plot_class_metrics(
     classification_report_dict: Dict[str, Dict[str, float]],
@@ -150,13 +150,13 @@ def plot_class_metrics(
     x = np.arange(len(classes))
     width = 0.25
     
-    plt.bar(x - width, precision, width, label='Precision')
-    plt.bar(x, recall, width, label='Recall')
-    plt.bar(x + width, f1_scores, width, label='F1-score')
+    plt.bar(x - width, precision, width, label='Kesinlik')
+    plt.bar(x, recall, width, label='yaklaşık doğruluk')
+    plt.bar(x + width, f1_scores, width, label='F1-skoru')
     
-    plt.xlabel('Speaker', fontsize=14)
-    plt.ylabel('Score', fontsize=14)
-    plt.title('Performance Metrics by Speaker', fontsize=16)
+    plt.xlabel('ses', fontsize=14)
+    plt.ylabel('skore', fontsize=14)
+    plt.title('ses kalitesi', fontsize=16)
     plt.xticks(x, classes, rotation=45, fontsize=12)
     plt.yticks(fontsize=12)
     plt.ylim(0, 1.1)
@@ -171,22 +171,15 @@ def plot_class_metrics(
     plt.legend(fontsize=12)
     plt.tight_layout()
     plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.savefig(os.path.join(output_dir, 'class_metrics.png'), dpi=300)
+    plt.savefig(os.path.join(output_dir, 'tanimlama_matris.png'), dpi=300)
     plt.close()
     
-    logging.info(f"Saved class metrics plot to {output_dir}")
+    logging.info(f"sınıflandırma matrisi resim yolu: {output_dir}")
 
 def plot_feature_importance(
     model,
     output_dir: str
 ) -> None:
-    """
-    Plot and save feature importance if available in the model.
-    
-    Args:
-        model: Trained model
-        output_dir: Directory to save the plot
-    """
     create_directory(output_dir)
     
     try:
@@ -195,29 +188,37 @@ def plot_feature_importance(
             indices = np.argsort(importances)[::-1]
             
             plt.figure(figsize=(12, 8))
-            plt.title('Feature Importances', fontsize=16)
+            plt.title('MODEL <--- Özellikleri', fontsize=16)
             plt.bar(range(len(importances)), importances[indices], align='center')
             
-            # Feature names based on our standard feature extraction
+            """
+            # mean=veri ortalaması, öğrnek: sakin ve net sesler için uyugun
+            # std=standart sapma, sesin ne kadar değiştiğini gösterir, öğrnek: kadın,erkek,çocuk,yaşlı gibi belirgin signallar için uygundur
+            # max=en yüksek değer, en yüksek enerji seviyesi, öğrnek: bağrma ani patlama, darbeli signaller için uygundur
+            # min=en düşük değer, en düşük enerji seviyesi, öğrnek: temiz veri çakilmiş, sakin sesler için uygundur
+            # energy=enerji seviyesi, sesin gücünü gösterir, öğrnek: RMS derlerin farklılığı
+            # ZCR=sıfır geçiş oranı, sesin sıfır geçiş sayısını gösterir, öğrnek: kalın,ince sesler için uygundur
+            # Segment Energy=segment enerji seviyesi, öğrnek: segment enerjilerinin farklılığı, farkılı diller konuşmuş sesler için uyugundur
+            """
+
             feature_names = ['Mean', 'Std', 'Max', 'Min', 'Energy', 'ZCR']
             for i in range(10):
-                feature_names.append(f'Segment {i+1} Energy')
+                feature_names.append(f'{i+1} enerji')
             
-            # Make sure we don't try to display more features than we have names for
+            # DEBUG:tekrarlayan özellikleri kaldır
             n_features = min(len(importances), len(feature_names))
-            plt.xticks(range(n_features), [feature_names[i] for i in indices[:n_features]], 
-                      rotation=90, fontsize=12)
+            plt.xticks(range(n_features), [feature_names[i] for i in indices[:n_features]], rotation=90, fontsize=12)
             
-            plt.xlabel('Features', fontsize=14)
-            plt.ylabel('Importance', fontsize=14)
+            plt.xlabel('yöntemler', fontsize=14)
+            plt.ylabel('özellik değiri', fontsize=14)
             plt.tight_layout()
             plt.grid(axis='y', linestyle='--', alpha=0.7)
             plt.savefig(os.path.join(output_dir, 'feature_importance.png'), dpi=300)
             plt.close()
             
-            logging.info(f"Saved feature importance plot to {output_dir}")
+            logging.info(f"özellik grafiği kayd: {output_dir}")
     except Exception as e:
-        logging.warning(f"Could not plot feature importance: {e}")
+        logging.warning(f"özellik grafiği oluşturulamadı: {e}")
 
 def plot_pca_visualization(
     X_test: np.ndarray,
@@ -226,29 +227,18 @@ def plot_pca_visualization(
     speaker_mapping: Dict[int, str],
     output_dir: str
 ) -> None:
-    """
-    Plot and save a PCA visualization of the test data.
-    
-    Args:
-        X_test: Test features
-        y_test: True labels
-        y_pred: Predicted labels
-        speaker_mapping: Mapping from indices to speaker names
-        output_dir: Directory to save the plot
-    """
     create_directory(output_dir)
     
     try:
         from sklearn.decomposition import PCA
         
-        # Apply PCA
+        # ------ PCA ------ 
         pca = PCA(n_components=2)
         X_pca = pca.fit_transform(X_test)
         
-        # Create figure
         plt.figure(figsize=(15, 10))
         
-        # Plot correctly classified points
+        # doğru sınıflandırma
         mask_correct = y_test == y_pred
         classes = np.unique(y_test)
         
@@ -256,27 +246,27 @@ def plot_pca_visualization(
         for cls in classes:
             mask = (y_test == cls) & mask_correct
             plt.scatter(X_pca[mask, 0], X_pca[mask, 1], 
-                       label=f"{speaker_mapping.get(cls, f'Speaker {cls}')} (correct)",
+                       label=f"{speaker_mapping.get(cls, f'Ses {cls}')} (doğrulu)",
                        alpha=0.7)
         
-        plt.title('PCA: Correctly Classified Samples', fontsize=16)
-        plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.2%} variance)', fontsize=14)
-        plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.2%} variance)', fontsize=14)
+        plt.title('Doğru sınıflandırma detayı', fontsize=16)
+        plt.xlabel(f'PC1 eksende yonluk ({pca.explained_variance_ratio_[0]:.2%})', fontsize=14)
+        plt.ylabel(f'PC2 eksende yonluk ({pca.explained_variance_ratio_[1]:.2%})', fontsize=14)
         plt.grid(alpha=0.3)
         plt.legend(fontsize=12)
         
-        # Plot misclassified points
+        # yanlış sınıflandırma
         plt.subplot(1, 2, 2)
         for cls in classes:
             mask = (y_test == cls) & ~mask_correct
             plt.scatter(X_pca[mask, 0], X_pca[mask, 1], 
                        marker='x', s=100,
-                       label=f"{speaker_mapping.get(cls, f'Speaker {cls}')} (misclassified)",
+                       label=f"{speaker_mapping.get(cls, f'Ses {cls}')} (yanlış sınıflandırma)",
                        alpha=0.7)
         
-        plt.title('PCA: Misclassified Samples', fontsize=16)
-        plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.2%} variance)', fontsize=14)
-        plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.2%} variance)', fontsize=14)
+        plt.title('yanlış sınıflandırma detayı', fontsize=16)
+        plt.xlabel(f'PC1 eksende yonluk ({pca.explained_variance_ratio_[0]:.2%})', fontsize=14)
+        plt.ylabel(f'PC2 eksende yonluk ({pca.explained_variance_ratio_[1]:.2%})', fontsize=14)
         plt.grid(alpha=0.3)
         plt.legend(fontsize=12)
         
@@ -284,9 +274,9 @@ def plot_pca_visualization(
         plt.savefig(os.path.join(output_dir, 'pca_visualization.png'), dpi=300)
         plt.close()
         
-        logging.info(f"Saved PCA visualization to {output_dir}")
+        logging.info(f"PCA görselleştirme kaydı: {output_dir}")
     except Exception as e:
-        logging.warning(f"Could not create PCA visualization: {e}")
+        logging.warning(f"PCA görselleştirme oluşturulamadı: {e}")
 
 def evaluate_model(
     model,
@@ -294,94 +284,69 @@ def evaluate_model(
     y_test: np.ndarray,
     speaker_mapping: Dict[int, str],
     output_dir: Optional[str] = None
-) -> Dict[str, Any]:
-    """
-    Evaluate a trained model on test data.
-    
-    Args:
-        model: Trained model
-        X_test: Test features
-        y_test: Test labels
-        speaker_mapping: Mapping from indices to speaker names
-        output_dir: Directory to save evaluation results
-        
-    Returns:
-        Dictionary with evaluation metrics
-    """
-    # Get predictions
+) -> Dict[str, Any]: 
+    # ------ Tahminler ------ 
     y_pred = model.predict(X_test)
     
-    # Calculate metrics
+    # ------ Metrikler ------ 
     accuracy = accuracy_score(y_test, y_pred)
     macro_f1 = f1_score(y_test, y_pred, average='macro')
     
-    logging.info(f"Model accuracy: {accuracy:.4f}")
-    logging.info(f"Macro F1 score: {macro_f1:.4f}")
+    logging.info(f"Model doğruluğu: {accuracy:.4f}")
+    logging.info(f"Makro F1 skoru: {macro_f1:.4f}")
     
-    # Get speaker names for labels
-    label_names = [speaker_mapping.get(i, f"Speaker {i}") for i in range(len(speaker_mapping))]
-    
-    # Generate and print classification report
+    label_names = [speaker_mapping.get(i, f"Ses {i}") for i in range(len(speaker_mapping))]
+        
+    # ------ Sınıflandırma Raporu ------ 
     report = classification_report(y_test, y_pred, target_names=label_names, output_dict=True)
     
-    logging.info("Classification Report:")
+    logging.info("Sınıflandırma Raporu:")
     for label, metrics in report.items():
         if isinstance(metrics, dict):
-            logging.info(f"  {label}: F1-score={metrics['f1-score']:.4f}, Precision={metrics['precision']:.4f}, Recall={metrics['recall']:.4f}")
+            logging.info(f"  {label}: F1-skoru={metrics['f1-score']:.4f}, Kesinlik={metrics['precision']:.4f}, yaklaşık doğruluk={metrics['recall']:.4f}")
     
-    # Create visualization plots if output_dir is provided
     if output_dir:
         create_directory(output_dir)
         
-        # Save classification report as text
         with open(os.path.join(output_dir, 'classification_report.txt'), 'w') as f:
             f.write(classification_report(y_test, y_pred, target_names=label_names))
         
-        # Save evaluation metrics as pickle
         metrics = {
-            'accuracy': accuracy,
-            'macro_f1': macro_f1,
-            'report': report
+            'doğruluk': accuracy,
+            'Makro F1 skoru': macro_f1,
+            'rapor': report
         }
         
         with open(os.path.join(output_dir, 'metrics.pkl'), 'wb') as f:
             pickle.dump(metrics, f)
         
-        # Plot confusion matrix
         plot_confusion_matrix(y_test, y_pred, label_names, output_dir)
-        
-        # Plot class-specific metrics
         plot_class_metrics(report, output_dir)
-        
-        # Plot feature importance if available
         plot_feature_importance(model, output_dir)
-        
-        # Plot PCA visualization
         plot_pca_visualization(X_test, y_test, y_pred, speaker_mapping, output_dir)
         
-        logging.info(f"Saved evaluation results and visualizations to {output_dir}")
+        logging.info(f"değerlendirme sonuçları ve görselleştirmeler kaydı: {output_dir}")
     
     return {
-        'accuracy': accuracy,
-        'macro_f1': macro_f1,
-        'report': report,
-        'y_pred': y_pred
+        'doğruluk': accuracy,
+        'Makro F1 skoru': macro_f1,
+        'rapor': report,
+        'tahmin': y_pred
     }
 
 def main():
-    """Main function for model evaluation"""
-    parser = argparse.ArgumentParser(description="Evaluate a trained speaker classification model")
-    parser.add_argument("--model_dir", type=str, required=True, help="Directory containing model and speaker mapping")
-    parser.add_argument("--test_features", type=str, help="Path to test features (pickle file)")
-    parser.add_argument("--test_labels", type=str, help="Path to test labels (pickle file)")
-    parser.add_argument("--output_dir", type=str, default="evaluation", help="Directory to save evaluation results")
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument("--model_dir", type=str, required=True, help="Model ve ses eşleme dosyası içeren dizin")
+    parser.add_argument("--test_features", type=str, help="Test özellikleri (pickle dosyası)")
+    parser.add_argument("--test_labels", type=str, help="Test etiketleri (pickle dosyası)")
+    parser.add_argument("--output_dir", type=str, default="evaluation", help="Değerlendirme sonuçlarını kaydetmek için dizin")
     
     args = parser.parse_args()
     
-    # Set up logging
+    # ------ Loglama ------ 
     setup_logging()
     
-    # Load model and speaker mapping
+    # ------ Model ve ses eşleme yükleme ------ 
     model_path = os.path.join(args.model_dir, 'model.pkl')
     mapping_path = os.path.join(args.model_dir, 'speaker_mapping.pkl')
     
@@ -389,10 +354,10 @@ def main():
     speaker_mapping = load_speaker_mapping(mapping_path)
     
     if model is None or not speaker_mapping:
-        logging.error("Could not load model or speaker mapping")
+        logging.error("Model veya ses eşleme yüklenemedi")
         return 1
     
-    # Load test data
+    # ------ Test verileri yükleme ------ 
     try:
         with open(args.test_features, 'rb') as f:
             X_test = pickle.load(f)
@@ -400,12 +365,12 @@ def main():
         with open(args.test_labels, 'rb') as f:
             y_test = pickle.load(f)
         
-        logging.info(f"Loaded test data: {len(X_test)} samples")
+        logging.info(f"Test verileri yüklendi: {len(X_test)} örnek")
     except Exception as e:
-        logging.error(f"Error loading test data: {e}")
+        logging.error(f"Test verileri yüklenemedi: {e}")
         return 1
     
-    # Evaluate model
+    # ------ Model değerlendirme ------ 
     evaluate_model(model, X_test, y_test, speaker_mapping, args.output_dir)
     
     return 0

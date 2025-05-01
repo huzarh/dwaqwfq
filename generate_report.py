@@ -89,8 +89,8 @@ def generate_html(run_dir: str, image_files: List[str], metrics: Dict[str, Any],
     print(f"Metrics keys: {list(metrics.keys())}")
     
     # Basic metrics
-    accuracy = metrics.get('accuracy', 'N/A')
-    macro_f1 = metrics.get('macro_f1', 'N/A')
+    accuracy = metrics.get('doğruluk', 'Nulll')
+    macro_f1 = metrics.get('Makro F1 skoru', 'Nulll')
     
     print(f"Accuracy: {accuracy}")
     print(f"Macro F1: {macro_f1}")
@@ -108,8 +108,8 @@ def generate_html(run_dir: str, image_files: List[str], metrics: Dict[str, Any],
     
     # Detailed class metrics
     class_metrics = {}
-    if 'report' in metrics:
-        for label, metrics_dict in metrics['report'].items():
+    if 'rapor' in metrics:
+        for label, metrics_dict in metrics['rapor'].items():
             if isinstance(metrics_dict, dict) and label not in ['accuracy', 'macro avg', 'weighted avg']:
                 class_metrics[label] = metrics_dict
     
@@ -122,7 +122,7 @@ def generate_html(run_dir: str, image_files: List[str], metrics: Dict[str, Any],
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaker Classification Report</title>
+    <title>Ses ile Görüntü Sınıflandırma Kategorisi Yarışma Sayısal Raporu</title>
     <style>
         body {{
             font-family: Arial, sans-serif;
@@ -221,34 +221,34 @@ def generate_html(run_dir: str, image_files: List[str], metrics: Dict[str, Any],
 </head>
 <body>
     <div class="header">
-        <h1>Speaker Classification Report</h1>
-        <p>Run: {os.path.basename(run_dir)}</p>
-        <p>Generated on: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+        <h1>Ses ile Görüntü Sınıflandırma Kategorisi Yarışma Sayısal Raporu</h1>
+        <p>Rapor ID: {os.path.basename(run_dir)}</p>
+        <p>Oluşturulma Tarihi: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
     </div>
     
-    <h2>Model Performance Metrics</h2>
+    <h2>Model Performans Ölçümleri</h2>
     <div class="metrics">
         <div class="metric-grid">
             <div class="metric-card">
                 <div class="metric-value">{accuracy_str}</div>
-                <div class="metric-label">Accuracy</div>
+                <div class="metric-label">Doğruluk 100-desi</div>
             </div>
             <div class="metric-card">
                 <div class="metric-value">{macro_f1_str}</div>
-                <div class="metric-label">Macro F1 Score</div>
+                <div class="metric-label">Makro F1 Skoru</div>
             </div>
         </div>
     </div>
     
-    <h2>Per-Class Performance</h2>
+    <h2>Ses sınıfı başarısı</h2>
     <table>
         <thead>
             <tr>
-                <th>Speaker</th>
-                <th>Precision</th>
-                <th>Recall</th>
-                <th>F1 Score</th>
-                <th>Support</th>
+                <th>Ses seti</th>
+                <th>Kesinlik</th>
+                <th>Yaklaşık Doğruluk</th>
+                <th>F1 Skoru (harmonik ortalaması)</th>
+                <th>Veri sayısı</th>
             </tr>
         </thead>
         <tbody>
@@ -256,10 +256,10 @@ def generate_html(run_dir: str, image_files: List[str], metrics: Dict[str, Any],
     
     # Add class metrics rows
     for label, metrics_dict in class_metrics.items():
-        precision = metrics_dict.get('precision', 'N/A')
-        recall = metrics_dict.get('recall', 'N/A')
-        f1_score = metrics_dict.get('f1-score', 'N/A')
-        support = metrics_dict.get('support', 'N/A')
+        precision = metrics_dict.get('precision', 'Null')
+        recall = metrics_dict.get('recall', 'Null')
+        f1_score = metrics_dict.get('f1-score', 'Null')
+        support = metrics_dict.get('support', 'Null')
         
         prec_str = f"{precision:.4f}" if isinstance(precision, float) else str(precision)
         rec_str = f"{recall:.4f}" if isinstance(recall, float) else str(recall)
@@ -279,7 +279,7 @@ def generate_html(run_dir: str, image_files: List[str], metrics: Dict[str, Any],
         </tbody>
     </table>
     
-    <h2>Visualizations</h2>
+    <h2>Grafikler</h2>
     <div class="visualizations">
         <div class="viz-grid">
 """
@@ -299,7 +299,7 @@ def generate_html(run_dir: str, image_files: List[str], metrics: Dict[str, Any],
     </div>
     
     <div class="footer">
-        <p>Speaker Classification System - Generated Report</p>
+        <p>2025 @ copyrigth by ZirCon</p>
     </div>
 </body>
 </html>
@@ -376,7 +376,7 @@ def main():
     print(f"Metrics path: {metrics_path} (exists: {os.path.exists(metrics_path)})")
     
     metrics = load_metrics(metrics_path) if os.path.exists(metrics_path) else {}
-    
+    print(f"-------------Metrics: {metrics}")
     # Copy images
     image_files = copy_images(run_dir, output_dir)
     
@@ -385,11 +385,10 @@ def main():
         return 1
     
     # Generate HTML
-    output_path = os.path.join(output_dir, "report.html")
+    output_path = os.path.join(output_dir, "rapor.html")
     generate_html(run_dir, image_files, metrics, output_path)
     
-    print(f"Report generated successfully at {output_path}")
-    print(f"You can open this file in your web browser to view the report.")
+    print(f"Rapor başarıyla oluşturuldu {output_path}")
     
     return 0
 
