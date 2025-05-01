@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# AUDIO IMAGE CLASSIFICATION 
+
+- Follow machine learning best practices for audio processing and classification.
+- Prioritize model accuracy, optimization, and innovation per competition goals.
+- Ensure testability and reproducibility of results.
+
+## General Rules
+- Never make assumptions: Clarify dataset characteristics, evaluation metrics, or competition requirements if unclear.
+- Discuss solutions first: Evaluate multiple ML approaches (e.g., MFCC with SVM, CNNs, transformers) before implementation.
+- Implement only approved features: Ensure all model architectures, preprocessing, and augmentations are discussed and agreed upon.
+- Answer in English: All documentation and communication must be in English.
+- Justify suggestions: Provide reasoning for model choices, preprocessing, or augmentation strategies based on competition goals (e.g., Macro F1 score).
+- All technical reports and documentation must provide detailed, academic-level explanations of data preprocessing, model architecture, training pipeline, and evaluation metrics, referencing state-of-the-art methods where applicable.
+
+## Development Rules
+- Follow SOLID and DRY principles: Write modular, reusable code for data preprocessing, model training, and evaluation.
+- Ensure maintainability: Organize code into modules (e.g., `preprocessing.py`, `model.py`, `evaluation.py`) with descriptive names.
+- Document thoroughly: Update docstrings/comments for all functions, classes, and preprocessing steps.
+- Version control: Use Git for code and DVC for dataset/model checkpoints.
+- Check compatibility: Ensure code aligns with dataset format (5000 audio samples, 10 speakers, image labels) and output requirements.
+- All preprocessing pipelines must include advanced denoising (e.g., WebRTC VAD), spectral feature extraction (MFCC, Mel-Spectrogram, Gammatone), and augmentation (time stretch, pitch shift, Gaussian noise) with parameter documentation.
+- Model architectures should be described in detail, including input/output shapes, layer types, and regularization strategies (e.g., Focal Loss, AdamW, CosineAnnealingLR, SpatialDropout2D, Mixup).
+- Training and validation splits must be deterministic and reproducible, with explicit mention of hardware and runtime environment.
+
+### Check the Impact of Changes to Shared or Inherited Code
+Whenever modifying preprocessing functions, model architectures, or evaluation scripts:
+
+🔍 You must:
+1. Identify all usages:
+   - Preprocessing: Check scripts using processed data.
+   - Models: Verify training/inference pipelines.
+   - Evaluation: Ensure compatibility with test output format.
+2. Evaluate impact:
+   - Could preprocessing changes affect model performance?
+   - Do model updates break checkpoints?
+   - Are evaluation changes aligned with Macro F1 score?
+3. Update or refactor:
+   - Refactor dependent code if needed.
+   - Document changes in a changelog.
+   - Revalidate with training data subset.
+- All changes must be reflected in technical documentation and, if relevant, in the project changelog.
+
+## Machine Learning Development Rules
+- Preprocessing:
+  - Apply audio preprocessing (e.g., noise reduction, normalization, MFCC, spectrograms).
+  - Handle dataset subsets, analyzing performance impact.
+  - Ensure deterministic preprocessing with fixed seeds.
+  - Document all preprocessing steps with parameter values and rationale.
+- Data Augmentation:
+  - Use audio augmentations (e.g., pitch shift, time stretch, noise) for robustness.
+  - Validate augmentation impact on training set.
+  - Augmentation parameters (e.g., ±5% time stretch, ±2 semitone pitch shift, SNR 25dB Gaussian noise) must be explicitly stated in documentation.
+- Model Development:
+  - Develop/adapt algorithms for speaker identification (e.g., CNNs, RNNs, transformers).
+  - Optimize for accuracy and efficiency, targeting Macro F1 score.
+  - Explore ensembles or transfer learning if resources allow.
+  - Model architecture must be described in technical reports, including input shape (e.g., (Batch, 1, 128, 128)), backbone (e.g., ResNet-18 1D-CNN), and output mapping.
+  - Regularization and optimization strategies (e.g., Focal Loss for class imbalance, AdamW, CosineAnnealingLR, Mixup) must be justified and documented.
+- Training:
+  - Use 90% training, 10% test split or justify alternatives.
+  - Apply cross-validation for model stability.
+  - Monitor overfitting with validation curves/early stopping.
+  - Training hardware, duration, and best checkpoint selection criteria (e.g., Macro F1) must be reported.
+- Evaluation:
+  - Validate with test dataset and competition output format.
+  - Compute multiple metrics (e.g., Macro F1, accuracy, precision, recall).
+  - Map audio predictions to image labels accurately.
+  - Present confusion matrix, ROC curves, and entropy analysis in reports.
+- Optimization:
+  - Optimize inference for varied hardware.
+  - Use lightweight models or quantization for efficiency.
+  - Report average inference time per sample.
+
+## Competition-Specific Rules
+- Dataset Usage:
+  - Handle test dataset (different sentences, same speakers) separately.
+  - Strategize subset usage, balancing performance and resources.
+- Output Format:
+  - Follow competition’s speaker classification format (e.g., `person1`, `person2`).
+  - Map audio predictions to image labels.
+  - Output files must strictly adhere to the required `.csv` format, e.g.:
+    ```
+    sample_0001.wav, person3
+    sample_0002.wav, person1
+    ```
+- Metrics:
+  - Prioritize Macro F1 score for evaluation.
+  - Present additional metrics (e.g., confusion matrix, per-class F1) in presentations.
+- Software:
+  - Use approved libraries (e.g., Librosa, TensorFlow, PyTorch) or custom solutions.
+- Innovation:
+  - Explore novel approaches (e.g., self-supervised learning, multi-modal fusion).
+  - Document innovations in submission.
+  - Multi-view ensemble and spectral attention mechanisms are encouraged and must be described if used.
+
+## Testing and Validation
+- Unit Testing:
+  - Test preprocessing pipelines for consistent outputs.
+  - Test model inference on sample audio for accuracy.
+- Integration Testing:
+  - Validate end-to-end pipeline with dataset subset.
+  - Ensure test data format compatibility.
+- Performance Testing:
+  - Benchmark training/inference times on typical hardware.
+  - Test subset performance trade-offs.
+- All test results, including logs, metric plots, confusion matrices, and ROC curves, must be included in the technical report appendix.
