@@ -28,7 +28,7 @@ def load_model(model_path: str):
     try:
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
-        logging.info(f"Loaded model from {model_path}")
+        logging.info(f"<kullanılan model> {model_path}")
         return model
     except Exception as e:
         logging.error(f"Error loading model from {model_path}: {e}")

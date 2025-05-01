@@ -1,0 +1,11 @@
+filename,speaker,confidence
+0001.wav,person1,57.00
+0011.wav,person2,88.00
+0012.wav,person2,89.00
+0012_2.wav,person2,92.00
+0044.wav,person7,66.00
+0044_2.wav,person4,41.00
+0054.wav,person9,88.00
+0054_2.wav,person9,88.00
+0055.wav,person10,58.00
+0055_2.wav,person10,77.00

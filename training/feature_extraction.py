@@ -22,10 +22,10 @@ def process_audio_directory(directory: str, output_dir: Optional[str] = None) ->
                 audio_files.append(os.path.join(root, file))
     
     if not audio_files:
-        logging.error(f"No WAV files found in {directory}")
+        logging.error(f"WAV dosyaları bulunamadı {directory}")
         return np.array([]), [], []
     
-    logging.info(f"Found {len(audio_files)} WAV files in {directory}")
+    logging.info(f"{directory}-- kullanılmış dosıya saysı ---> {len(audio_files)}")
     
     # ------ Özellikleri çıkarma ------ 
     features = []
@@ -58,7 +58,7 @@ def process_audio_directory(directory: str, output_dir: Optional[str] = None) ->
         with open(os.path.join(output_dir, 'speaker_names.pkl'), 'wb') as f:
             pickle.dump(speaker_names, f)
         
-        logging.info(f"Saved extracted features to {output_dir}")
+        logging.info(f"<çıkarılan özellikler> {output_dir} burda kaydedildi")
     
     return features_array, file_paths, speaker_names
 
@@ -74,22 +74,22 @@ def create_label_array(speaker_names: List[str], speaker_mapping: Dict[int, str]
     return labels
 
 def main(): 
-    parser = argparse.ArgumentParser(description="Extract features from audio files")
-    parser.add_argument("--data_dir", type=str, required=True, help="Directory containing audio files")
-    parser.add_argument("--output_dir", type=str, default="features", help="Directory to save extracted features")
+    parser = argparse.ArgumentParser(description="Özellikleri çıkarır")
+    parser.add_argument("--data_dir", type=str, required=True, help="Ses dosyalarının bulunduğu dizin")
+    parser.add_argument("--output_dir", type=str, default="features", help="Özelliklerin kaydedileceği dizin")
     
     args = parser.parse_args()
     
     # ------ Loglama ------ 
     setup_logging()
     
-    logging.info(f"Extracting features from {args.data_dir}")
+    logging.info(f"Çalışma ---> {args.data_dir}")
     
     # ------ Ses dosyaları işleme ------ 
     features, file_paths, speaker_names = process_audio_directory(args.data_dir, args.output_dir)
     
     if len(features) == 0:
-        logging.error("No features extracted")
+        logging.error("Özellik çıkarılmadı")
         return 1
     
     speaker_mapping = create_speaker_mapping(speaker_names)
