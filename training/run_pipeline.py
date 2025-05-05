@@ -72,6 +72,7 @@ def run_training_pipeline(args: argparse.Namespace) -> bool:
     logging.info(f"çıktı dizini: {output_dir}")
     
     logging.info("============== Özellik çıkarım ==============")
+
     feature_extraction_cmd = [
         "python", "-m", "training.feature_extraction",
         "--data_dir", args.data_dir,
@@ -120,10 +121,10 @@ def run_training_pipeline(args: argparse.Namespace) -> bool:
     return True
 
 def main():
-    parser = argparse.ArgumentParser(description="Run the complete speaker classification training pipeline")
-    parser.add_argument("--data_dir", type=str, required=True, help="Directory containing the training dataset")
-    parser.add_argument("--output_dir", type=str, default="training_outputs", help="Base directory for outputs")
-    parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data_dir", type=str, required=True)
+    parser.add_argument("--output_dir", type=str, default="training_outputs")
+    parser.add_argument("--seed", type=int, default=42)
     
     args = parser.parse_args()
     

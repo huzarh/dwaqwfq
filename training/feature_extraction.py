@@ -67,11 +67,13 @@ def create_speaker_mapping(speaker_names: List[str]) -> Dict[int, str]:
     return {i: name for i, name in enumerate(unique_speakers)}
 
 def create_label_array(speaker_names: List[str], speaker_mapping: Dict[int, str]) -> np.ndarray:
-    # ters eşleme
     reverse_mapping = {name: idx for idx, name in speaker_mapping.items()} 
     labels = np.array([reverse_mapping[name] for name in speaker_names])
     
     return labels
+
+
+#----------------------------------- öğzellik ------------------------------#
 
 def main(): 
     parser = argparse.ArgumentParser(description="Özellikleri çıkarır")

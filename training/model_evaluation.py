@@ -16,15 +16,6 @@ sys.path.append(parent_dir)
 from training.utils import setup_logging, create_directory
 
 def load_model(model_path: str):
-    """
-    Load a trained model from a pickle file.
-    
-    Args:
-        model_path: Path to the model file
-        
-    Returns:
-        Loaded model
-    """
     try:
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
@@ -35,15 +26,6 @@ def load_model(model_path: str):
         return None
 
 def load_speaker_mapping(mapping_path: str) -> Dict[int, str]:
-    """
-    Load the speaker mapping from a pickle file.
-    
-    Args:
-        mapping_path: Path to the speaker mapping file
-        
-    Returns:
-        Dictionary mapping indices to speaker names
-    """
     try:
         with open(mapping_path, 'rb') as f:
             mapping = pickle.load(f)
@@ -59,15 +41,6 @@ def plot_confusion_matrix(
     labels: List[str],
     output_dir: str
 ) -> None:
-    """
-    Plot and save a confusion matrix.
-    
-    Args:
-        y_true: True labels
-        y_pred: Predicted labels
-        labels: Label names
-        output_dir: Directory to save the plot
-    """
     create_directory(output_dir)
     
     cm = confusion_matrix(y_true, y_pred)
